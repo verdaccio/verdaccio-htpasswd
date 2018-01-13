@@ -45,12 +45,10 @@ class HTPasswd {
    *
    */
   authenticate(user, password, cb) {
-    console.log(user, password);
     this.reload((err) => {
       if (err) return cb(err.code === 'ENOENT' ? null : err);
       if (!this.users[user]) return cb(null, false);
-      console.log(this.users);
-      if (verifyPassword(user, password, this.users[user])) {
+      if (verifyPassword(password, this.users[user])) {
         return cb(null, false);
       }
 
@@ -81,7 +79,7 @@ class HTPasswd {
 
     // preliminary checks, just to ensure that file won't be reloaded if it's not needed
     if (sanityCheck()) {
-      return realCb(sanityCheck, false);
+      return realCb(sanityCheck(), false);
     }
 
     lockAndRead(this.path, (err, res) => {
@@ -110,7 +108,7 @@ class HTPasswd {
       this.users = parseHTPasswd(body);
 
       // real checks, to prevent race conditions
-      if (sanityCheck) return cb(sanityCheck);
+      if (sanityCheck()) return cb(sanityCheck());
 
       try {
         body = addUserToHTPasswd(body, user, password);

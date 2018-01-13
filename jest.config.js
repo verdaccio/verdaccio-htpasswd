@@ -2,13 +2,12 @@
 
 module.exports = {
   'name': 'htpasswd-auth-jest',
-  'jest': {
-    'verbose': true
-  },
+  'verbose': true,
   'collectCoverage': true,
   'coveragePathIgnorePatterns': [
     'node_modules',
     '_storage',
-    'fixtures'
+    'fixtures',
+    'lib'
   ]
 };
