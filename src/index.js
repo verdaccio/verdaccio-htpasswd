@@ -42,7 +42,10 @@ class HTPasswd {
   }
 
   /**
-   *
+   * authenticate
+   * @params {user}
+   * @params {string}
+   * @params {function}
    */
   authenticate(user, password, cb) {
     this.reload((err) => {
@@ -133,7 +136,8 @@ class HTPasswd {
   }
 
   /**
-   *
+   * Reload users
+   * @params {function} callback
    */
   reload(callback) {
     fs.stat(this.path, (err, stats) => {
@@ -153,8 +157,6 @@ class HTPasswd {
         }
 
         this.users = parseHTPasswd(buffer);
-        console.log('checking arrow function');
-        console.log(this.users);
         callback();
       });
     });

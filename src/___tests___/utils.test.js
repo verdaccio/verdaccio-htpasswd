@@ -1,9 +1,11 @@
+import * as locker from '@verdaccio/file-locking';
+
 import {
   verifyPassword,
-  // lockAndRead,
-  // unlockFile,
+  lockAndRead,
+  unlockFile,
   parseHTPasswd,
-  // addUserToHTPasswd
+  addUserToHTPasswd,
 } from '../utils';
 
 describe('parseHTPasswd', () => {
@@ -60,5 +62,70 @@ describe('verifyPassword', () => {
   it('should verify the crypto SHA password with false', () => {
     const input = ['testpasswordchanged', '{SHA}i7YRj4/Wk1rQh2o740pxfTJwj/0='];
     expect(verifyPassword(...input)).toBeFalsy();
+  });
+});
+
+
+describe('addUserToHTPasswd - crypt3', () => {
+  beforeAll(() => {
+    global.Date = jest.fn(() => {
+      return {
+        toJSON: () => '2018-01-14T11:17:40.712Z',
+      };
+    });
+  });
+
+  it('should add new htpasswd to the end', () => {
+    const input = ['', 'username', 'password'];
+    expect(addUserToHTPasswd(...input)).toMatchSnapshot();
+  });
+
+  it('should add new htpasswd to the end in multiline input', () => {
+    const body = `test1:$6b9MlB3WUELU:autocreated 2017-11-06T18:17:21.957Z
+    test2:$6FrCaT/v0dwE:autocreated 2017-12-14T13:30:20.838Z`;
+    const input = [body, 'username', 'password'];
+    expect(addUserToHTPasswd(...input)).toMatchSnapshot();
+  });
+
+  it('should throw an error for incorrect username with space', () => {
+    const input = ['', 'firstname lastname', 'password'];
+    expect(() => addUserToHTPasswd(...input)).toThrowErrorMatchingSnapshot();
+  });
+});
+
+// ToDo: mock crypt3 with false
+// describe('addUserToHTPasswd - crypto', () => {
+//   it('should create password with crypto', () => {
+//   jest.resetModules();
+//   jest.mock('../crypt3', () => false);
+//   const input = ['', 'username', 'password'];
+//   addUserToHTPasswd(...input);
+//    // expect(addUserToHTPasswd(...input)).toEqual('sdssddsd');
+//   });
+// });
+
+describe('lockAndRead', () => {
+  beforeAll(() => {
+    locker.readFile = jest.fn();
+  });
+
+  it('should call the readFile method', () => {
+    const cb = () => {};
+    lockAndRead('.htpasswd', cb);
+    expect(locker.readFile).toHaveBeenCalled();
+  });
+
+});
+
+
+describe('unlockFile', () => {
+  beforeAll(() => {
+    locker.unlockFile = jest.fn();
+  });
+
+  it('should call the unlock method', () => {
+    const cb = () => {};
+    unlockFile('htpasswd', cb);
+    expect(locker.readFile).toHaveBeenCalled();
   });
 });

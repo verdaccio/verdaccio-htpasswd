@@ -64,7 +64,7 @@ export function verifyPassword(passwd: string, hash: string): boolean {
 export function addUserToHTPasswd(body: string, user: string, passwd: string): string {
   if (user !== encodeURIComponent(user)) {
     let err = Error('username should not contain non-uri-safe characters');
-    err.status = 409;
+    // err.status = 409;
     throw err;
   }
 
