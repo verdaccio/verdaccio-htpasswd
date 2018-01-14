@@ -46,9 +46,13 @@ class HTPasswd {
    */
   authenticate(user, password, cb) {
     this.reload((err) => {
-      if (err) return cb(err.code === 'ENOENT' ? null : err);
-      if (!this.users[user]) return cb(null, false);
-      if (verifyPassword(password, this.users[user])) {
+      if (err) {
+        return cb(err.code === 'ENOENT' ? null : err);
+      }
+      if (!this.users[user]) {
+        return cb(null, false);
+      }
+      if (!verifyPassword(password, this.users[user])) {
         return cb(null, false);
       }
 
@@ -73,7 +77,9 @@ class HTPasswd {
       } else if (Object.keys(this.users).length >= this.maxUsers) {
         err = Error('maximum amount of users reached');
       }
-      if (err) err.status = 403;
+      if (err) {
+        err.status = 403;
+      }
       return err;
     };
 
@@ -88,7 +94,7 @@ class HTPasswd {
       // callback that cleans up lock first
       const cb = (err) => {
         if (locked) {
-          unlockFile(this.path, function() {
+          unlockFile(this.path, () => {
             // ignore any error from the unlock
             realCb(err, !err);
           });
@@ -116,7 +122,9 @@ class HTPasswd {
         return cb(err);
       }
       fs.writeFile(this.path, body, (err) => {
-        if (err) return cb(err);
+        if (err) {
+          return cb(err);
+        }
         this.reload(function() {
           cb(null, true);
         });
@@ -129,16 +137,24 @@ class HTPasswd {
    */
   reload(callback) {
     fs.stat(this.path, (err, stats) => {
-      if (err) return callback(err);
+      if (err) {
+        return callback(err);
+      }
 
-      if (this.lastTime === stats.mtime) return callback();
+      if (this.lastTime === stats.mtime) {
+        return callback();
+      }
+
       this.lastTime = stats.mtime;
 
       fs.readFile(this.path, 'utf8', (err, buffer) => {
-        if (err) return callback(err);
+        if (err) {
+          return callback(err);
+        }
 
         this.users = parseHTPasswd(buffer);
-
+        console.log('checking arrow function');
+        console.log(this.users);
         callback();
       });
     });
