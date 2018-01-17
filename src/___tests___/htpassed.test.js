@@ -1,6 +1,8 @@
+import fs from 'fs';
 import HTPasswd from '../htpasswd';
 import Logger from './__mocks__/Logger';
 import Config from './__mocks__/Config';
+
 
 const stuff = {
     logger: new Logger(),
@@ -52,4 +54,21 @@ describe('HTPasswd', () => {
       wrapper.authenticate('test', 'somerandompassword', callback);
     });
 
+    it('addUser - it should not pass sanity check', (done) => {
+        const callback = (a, b) => {
+          expect(a.message).toEqual('this user already exists');
+          done();
+        };
+        wrapper.adduser('test', 'somerandompassword', callback);
+    });
+
+    it('addUser - it should add the user', (done) => {
+        fs.writeFile = jest.fn(() => done());
+        const callback = (a, b) => {
+            console.log(a);
+            console.log(b);
+            expect(fs.writeFile).toHaveBeenCalled();
+        };
+        wrapper.adduser('usernotpresent', 'somerandompassword', callback);
+    });
 });

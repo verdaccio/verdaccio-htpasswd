@@ -79,13 +79,12 @@ export default class HTPasswd {
    * @param {function} real_cb
    */
   adduser(user, password, realCb) {
-
-    const sanity = sanityCheck(user, this.users, this.maxUsers);
+    let sanity = sanityCheck(user, this.users, this.maxUsers);
 
     // preliminary checks, just to ensure that file won't be reloaded if it's
     // not needed
-    if (sanity()) {
-      return realCb(sanity(), false);
+    if (sanity) {
+      return realCb(sanity, false);
     }
 
     lockAndRead(this.path, (err, res) => {
@@ -114,18 +113,24 @@ export default class HTPasswd {
       this.users = parseHTPasswd(body);
 
       // real checks, to prevent race conditions
-      if (sanity()) return cb(sanity());
+      // parsing users after reading file.
+      sanity = sanityCheck(user, this.users, this.maxUsers);
+
+      if (sanity) {
+        return cb(sanity);
+      }
 
       try {
         body = addUserToHTPasswd(body, user, password);
       } catch (err) {
         return cb(err);
       }
+
       fs.writeFile(this.path, body, (err) => {
         if (err) {
           return cb(err);
         }
-        this.reload(function() {
+        this.reload(() => {
           cb(null, true);
         });
       });
