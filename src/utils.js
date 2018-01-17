@@ -86,3 +86,23 @@ export function addUserToHTPasswd(body: string, user: string, passwd: string): s
   }
   return body + newline;
 }
+
+/**
+ * Sanity check for a user
+ * @param {string} user
+ * @param {object} users
+ * @param {number} maxUsers
+ * @returns {object}
+ */
+export function sanityCheck(user: string, users: {}, maxUsers: number) {
+  let err = null;
+  if (users[user]) {
+    err = Error('this user already exists');
+  } else if (Object.keys(users).length >= maxUsers) {
+    err = Error('maximum amount of users reached');
+  }
+  if (err) {
+    // err.status = 403;
+  }
+  return err;
+}

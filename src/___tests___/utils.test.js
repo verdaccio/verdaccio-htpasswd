@@ -6,6 +6,7 @@ import {
   unlockFile,
   parseHTPasswd,
   addUserToHTPasswd,
+  sanityCheck,
 } from '../utils';
 
 describe('parseHTPasswd', () => {
@@ -117,7 +118,6 @@ describe('lockAndRead', () => {
 
 });
 
-
 describe('unlockFile', () => {
   beforeAll(() => {
     locker.unlockFile = jest.fn();
@@ -129,3 +129,23 @@ describe('unlockFile', () => {
     expect(locker.readFile).toHaveBeenCalled();
   });
 });
+
+describe('sanityCheck', () => {
+  it('should thorw error for user already exists', () => {
+    const users = {test: '$6FrCaT/v0dwE'};
+    const input = sanityCheck('test', users, Infinity);
+    expect(input.message).toEqual('this user already exists');
+  });
+  it('should thorw error max number of users', () => {
+    const users = {test: '$6FrCaT/v0dwE'};
+    const input = sanityCheck('username', users, 1);
+    expect(input.message).toEqual('maximum amount of users reached');
+  });
+  it('should not throw anything and sanity check', () => {
+    const users = {test: '$6FrCaT/v0dwE'};
+    const input = sanityCheck('username', users, 2);
+    expect(input).toBeNull();
+  });
+});
+
+

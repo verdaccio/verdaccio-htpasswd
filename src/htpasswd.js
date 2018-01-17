@@ -6,6 +6,7 @@ import {
   unlockFile,
   parseHTPasswd,
   addUserToHTPasswd,
+  sanityCheck,
 } from './utils';
 
 export default class HTPasswd {
@@ -73,27 +74,18 @@ export default class HTPasswd {
    * 5. reload .htpasswd
    * 6. unlock file
    *
-   * @param {*} user
-   * @param {*} password
-   * @param {*} real_cb
+   * @param {string} user
+   * @param {string} password
+   * @param {function} real_cb
    */
   adduser(user, password, realCb) {
-    const sanityCheck = () => {
-      let err = null;
-      if (this.users[user]) {
-        err = Error('this user already exists');
-      } else if (Object.keys(this.users).length >= this.maxUsers) {
-        err = Error('maximum amount of users reached');
-      }
-      if (err) {
-        err.status = 403;
-      }
-      return err;
-    };
 
-    // preliminary checks, just to ensure that file won't be reloaded if it's not needed
-    if (sanityCheck()) {
-      return realCb(sanityCheck(), false);
+    const sanity = sanityCheck(user, this.users, this.maxUsers);
+
+    // preliminary checks, just to ensure that file won't be reloaded if it's
+    // not needed
+    if (sanity()) {
+      return realCb(sanity(), false);
     }
 
     lockAndRead(this.path, (err, res) => {
@@ -122,7 +114,7 @@ export default class HTPasswd {
       this.users = parseHTPasswd(body);
 
       // real checks, to prevent race conditions
-      if (sanityCheck()) return cb(sanityCheck());
+      if (sanity()) return cb(sanity());
 
       try {
         body = addUserToHTPasswd(body, user, password);
@@ -149,7 +141,6 @@ export default class HTPasswd {
       if (err) {
         return callback(err);
       }
-
       if (this.lastTime === stats.mtime) {
         return callback();
       }
@@ -161,7 +152,7 @@ export default class HTPasswd {
           return callback(err);
         }
 
-        this.users = parseHTPasswd(buffer);
+        Object.assign(this.users, parseHTPasswd(buffer));
         callback();
       });
     });
