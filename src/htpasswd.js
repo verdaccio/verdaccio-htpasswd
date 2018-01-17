@@ -9,7 +9,15 @@ import {
   sanityCheck,
 } from './utils';
 
+/**
+ * HTPasswd - Verdaccio auth class
+ */
 export default class HTPasswd {
+  /**
+   * 
+   * @param {*} config htpasswd file
+   * @param {object} stuff config.yaml in object from
+   */
   constructor(config, stuff) {
     this.users = {};
 
@@ -41,10 +49,11 @@ export default class HTPasswd {
   }
 
   /**
-   * authenticate
-   * @params {user}
-   * @params {string}
-   * @params {function}
+   * authenticate - Authenticate user.
+   * @param {string} user
+   * @param {string} password
+   * @param {function} cd
+   * @returns {function}
    */
   authenticate(user, password, cb) {
     this.reload((err) => {
@@ -76,7 +85,8 @@ export default class HTPasswd {
    *
    * @param {string} user
    * @param {string} password
-   * @param {function} real_cb
+   * @param {function} realCb
+   * @returns {function}
    */
   adduser(user, password, realCb) {
     let sanity = sanityCheck(user, this.users, this.maxUsers);
@@ -139,7 +149,7 @@ export default class HTPasswd {
 
   /**
    * Reload users
-   * @params {function} callback
+   * @param {function} callback
    */
   reload(callback) {
     fs.stat(this.path, (err, stats) => {
