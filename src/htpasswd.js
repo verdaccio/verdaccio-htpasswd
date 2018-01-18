@@ -6,7 +6,7 @@ import {
   unlockFile,
   parseHTPasswd,
   addUserToHTPasswd,
-  sanityCheck,
+  sanityCheck
 } from './utils';
 
 /**
@@ -14,7 +14,7 @@ import {
  */
 export default class HTPasswd {
   /**
-   * 
+   *
    * @param {*} config htpasswd file
    * @param {object} stuff config.yaml in object from
    */
@@ -36,7 +36,7 @@ export default class HTPasswd {
 
     this.lastTime = null;
 
-    let {file} = config;
+    let { file } = config;
 
     if (!file) file = this.verdaccioConfig.users_file;
 
@@ -56,7 +56,7 @@ export default class HTPasswd {
    * @returns {function}
    */
   authenticate(user, password, cb) {
-    this.reload((err) => {
+    this.reload(err => {
       if (err) {
         return cb(err.code === 'ENOENT' ? null : err);
       }
@@ -69,7 +69,8 @@ export default class HTPasswd {
 
       // authentication succeeded!
       // return all usergroups this user has access to;
-      // (this particular package has no concept of usergroups, so just return user herself)
+      // (this particular package has no concept of usergroups, so just return
+      // user herself)
       return cb(null, [user]);
     });
   }
@@ -101,7 +102,7 @@ export default class HTPasswd {
       let locked = false;
 
       // callback that cleans up lock first
-      const cb = (err) => {
+      const cb = err => {
         if (locked) {
           unlockFile(this.path, () => {
             // ignore any error from the unlock
@@ -136,7 +137,7 @@ export default class HTPasswd {
         return cb(err);
       }
 
-      fs.writeFile(this.path, body, (err) => {
+      fs.writeFile(this.path, body, err => {
         if (err) {
           return cb(err);
         }
