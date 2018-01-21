@@ -57,9 +57,10 @@ export function verifyPassword(passwd: string, hash: string): boolean {
 
 /**
  * addUserToHTPasswd - Generate a htpasswd format for .htpasswd
- * @param {*} body
- * @param {*} user
- * @param {*} passwd
+ * @param {string} body
+ * @param {string} user
+ * @param {string} passwd
+ * @returns {string}
  */
 export function addUserToHTPasswd(
   body: string,

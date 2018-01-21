@@ -1,3 +1,5 @@
+// @flow
+
 import fs from 'fs';
 import Path from 'path';
 import {
@@ -18,7 +20,28 @@ export default class HTPasswd {
    * @param {*} config htpasswd file
    * @param {object} stuff config.yaml in object from
    */
-  constructor(config, stuff) {
+  // flow types
+  users: {};
+  stuff: {};
+  config: {};
+  verdaccioConfig: {};
+  maxUsers: number;
+  path: string;
+  logger: {};
+  lastTime: any;
+  // constructor
+  constructor(
+    config: {
+      file: string,
+      max_users: number
+    },
+    stuff: {
+      [config: string]: {
+        users_file: string,
+        self_path: string
+      }
+    }
+  ) {
     this.users = {};
 
     // config for this module
@@ -32,7 +55,7 @@ export default class HTPasswd {
     this.verdaccioConfig = stuff.config;
 
     // all this "verdaccio_config" stuff is for b/w compatibility only
-    this.maxUsers = this.config.max_users ? this.config.max_users : Infinity;
+    this.maxUsers = config.max_users ? config.max_users : Infinity;
 
     this.lastTime = null;
 
@@ -55,7 +78,7 @@ export default class HTPasswd {
    * @param {function} cd
    * @returns {function}
    */
-  authenticate(user, password, cb) {
+  authenticate(user: string, password: string, cb: Function) {
     this.reload(err => {
       if (err) {
         return cb(err.code === 'ENOENT' ? null : err);
@@ -89,7 +112,7 @@ export default class HTPasswd {
    * @param {function} realCb
    * @returns {function}
    */
-  adduser(user, password, realCb) {
+  adduser(user: string, password: string, realCb: Function) {
     let sanity = sanityCheck(user, this.users, this.maxUsers);
 
     // preliminary checks, just to ensure that file won't be reloaded if it's
@@ -142,7 +165,7 @@ export default class HTPasswd {
           return cb(err);
         }
         this.reload(() => {
-          cb(null, true);
+          cb(null);
         });
       });
     });
@@ -152,7 +175,7 @@ export default class HTPasswd {
    * Reload users
    * @param {function} callback
    */
-  reload(callback) {
+  reload(callback: Function) {
     fs.stat(this.path, (err, stats) => {
       if (err) {
         return callback(err);
