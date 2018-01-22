@@ -9,9 +9,7 @@
 # Created to work with eslint@0.18.0
 #
 
-extends: ["prettier"]
-
-plugins: ["prettier"]
+extends: ["plugin:prettier/recommended"]
 
 settings:
     flowtype:
