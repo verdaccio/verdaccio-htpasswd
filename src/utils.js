@@ -102,17 +102,31 @@ export function addUserToHTPasswd(
  * @param {number} maxUsers
  * @returns {object}
  */
-export function sanityCheck(user: string, users: {}, maxUsers: number) {
-  let err = null;
-  if (users[user]) {
-    err = Error('this user already exists');
-  } else if (Object.keys(users).length >= maxUsers) {
-    err = Error('maximum amount of users reached');
-  }
-
-  if (err) {
+export function sanityCheck(
+  user: string,
+  password: string,
+  verifyFn: Function,
+  users: {},
+  maxUsers: number
+) {
+  const hash = users[user];
+  if (Object.keys(users).length >= maxUsers) {
+    const err = Error('maximum amount of users reached');
     // $FlowFixMe
     err.status = 403;
+    return err;
   }
-  return err;
+
+  if (hash) {
+    const auth = verifyFn(password, users[user]);
+    if (auth) {
+      return true;
+    }
+    const err = Error('unauthorized access');
+    // $FlowFixMe
+    err.status = 401;
+    return err;
+  }
+
+  return null;
 }
