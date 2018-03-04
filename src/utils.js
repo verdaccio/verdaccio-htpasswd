@@ -109,9 +109,21 @@ export function sanityCheck(
   users: {},
   maxUsers: number
 ) {
-  const hash = users[user];
+  let err;
+  let hash;
+
+  // check for user or password
+  if (!user || !password) {
+    err = Error('username and password is required');
+    // $FlowFixMe
+    err.status = 400;
+    return err;
+  }
+
+  hash = users[user];
+
   if (Object.keys(users).length >= maxUsers) {
-    const err = Error('maximum amount of users reached');
+    err = Error('maximum amount of users reached');
     // $FlowFixMe
     err.status = 403;
     return err;
@@ -122,7 +134,7 @@ export function sanityCheck(
     if (auth) {
       return true;
     }
-    const err = Error('unauthorized access');
+    err = Error('unauthorized access');
     // $FlowFixMe
     err.status = 401;
     return err;
