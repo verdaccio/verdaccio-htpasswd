@@ -131,19 +131,26 @@ describe('unlockFile', () => {
 });
 
 describe('sanityCheck', () => {
-  it('should thorw error for user already exists', () => {
-    const users = { test: '$6FrCaT/v0dwE' };
-    const input = sanityCheck('test', users, Infinity);
-    expect(input.message).toEqual('this user already exists');
+  let users;
+  beforeEach(() => {
+    users = { test: '$6FrCaT/v0dwE' };
   });
-  it('should thorw error max number of users', () => {
-    const users = { test: '$6FrCaT/v0dwE' };
-    const input = sanityCheck('username', users, 1);
+  it('should throw error for user already exists', () => {
+    const verifyFn = jest.fn();
+    const input = sanityCheck('test', users.test, verifyFn, users, Infinity);
+    expect(input.status).toEqual(401);
+    expect(input.message).toEqual('unauthorized access');
+    expect(verifyFn).toHaveBeenCalled();
+  });
+  it('should throw error max number of users', () => {
+    const verifyFn = jest.fn();
+    const input = sanityCheck('username', users.test, verifyFn, users, -1);
+    expect(input.status).toEqual(403);
     expect(input.message).toEqual('maximum amount of users reached');
   });
   it('should not throw anything and sanity check', () => {
-    const users = { test: '$6FrCaT/v0dwE' };
-    const input = sanityCheck('username', users, 2);
+    const verifyFn = jest.fn();
+    const input = sanityCheck('username', users.test, verifyFn, users, 2);
     expect(input).toBeNull();
   });
 });
