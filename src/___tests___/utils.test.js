@@ -143,14 +143,38 @@ describe('sanityCheck', () => {
     expect(verifyFn).toHaveBeenCalled();
   });
   it('should throw error max number of users', () => {
-    const verifyFn = jest.fn();
+    const verifyFn = () => {};
     const input = sanityCheck('username', users.test, verifyFn, users, -1);
     expect(input.status).toEqual(403);
     expect(input.message).toEqual('maximum amount of users reached');
   });
   it('should not throw anything and sanity check', () => {
-    const verifyFn = jest.fn();
+    const verifyFn = () => {};
     const input = sanityCheck('username', users.test, verifyFn, users, 2);
     expect(input).toBeNull();
+  });
+  it('should throw error for required username field', () => {
+    const verifyFn = () => {};
+    const input = sanityCheck(undefined, users.test, verifyFn, users, 2);
+    expect(input.message).toEqual('username and password is required');
+    expect(input.status).toEqual(400);
+  });
+  it('should throw error for required password field', () => {
+    const verifyFn = () => {};
+    const input = sanityCheck('username', undefined, verifyFn, users, 2);
+    expect(input.message).toEqual('username and password is required');
+    expect(input.status).toEqual(400);
+  });
+  it('should throw error for required username & password fields', () => {
+    const verifyFn = () => {};
+    const input = sanityCheck(undefined, undefined, verifyFn, users, 2);
+    expect(input.message).toEqual('username and password is required');
+    expect(input.status).toEqual(400);
+  });
+  it('should successfully authenicate the user', () => {
+    const verifyFn = jest.fn(() => true);
+    const input = sanityCheck('test', users.test, verifyFn, users, 2);
+    expect(input).toBeTruthy();
+    expect(verifyFn).toHaveBeenCalled();
   });
 });
