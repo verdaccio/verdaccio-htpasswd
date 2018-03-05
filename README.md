@@ -19,7 +19,7 @@ As simple as running:
             # You can set this to -1 to disable registration.
             #max_users: 1000
 
-## Loging In
+## Logging In
 
 To log in using NPM, run:
 
@@ -29,7 +29,7 @@ To log in using NPM, run:
 
 ## Generate htpasswd username/password combination
 
-If you wish to handle access control using htpasswd file, you can genetate 
+If you wish to handle access control using htpasswd file, you can generate 
 username/password combination form 
 [here](http://www.htaccesstools.com/htpasswd-generator/) and add it to htpasswd
 file.
