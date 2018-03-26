@@ -133,16 +133,16 @@ describe('unlockFile', () => {
 describe('sanityCheck', () => {
   let users;
   beforeEach(() => {
-    users = { test: '$6FrCaT/v0dwE' };
+    users = { test: '$66to3JK5RgZM' };
   });
-  it('should throw error for user already exists', () => {
-    const verifyFn = jest.fn();
+  it('should throw an error indicating the password is incorrect', () => {
+    const verifyFn = jest.fn(() => false);
     const input = sanityCheck('test', users.test, verifyFn, users, Infinity);
-    expect(input.status).toEqual(401);
+    expect(input.status).toEqual(403);
     expect(input.message).toEqual('unauthorized access');
     expect(verifyFn).toHaveBeenCalled();
   });
-  it('should throw error max number of users', () => {
+  it('should throw an error indicating the max number of users was reached', () => {
     const verifyFn = () => {};
     const input = sanityCheck('username', users.test, verifyFn, users, -1);
     expect(input.status).toEqual(403);
@@ -171,10 +171,11 @@ describe('sanityCheck', () => {
     expect(input.message).toEqual('username and password is required');
     expect(input.status).toEqual(400);
   });
-  it('should successfully authenicate the user', () => {
+  it('should successfully  the user', () => {
     const verifyFn = jest.fn(() => true);
-    const input = sanityCheck('test', users.test, verifyFn, users, 2);
-    expect(input).toBeTruthy();
+    const input = sanityCheck('test', 'password', verifyFn, users, 2);
+    expect(input.status).toEqual(409);
+    expect(input.message).toEqual('username is already registered');
     expect(verifyFn).toHaveBeenCalled();
   });
 });
