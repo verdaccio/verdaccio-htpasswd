@@ -61,10 +61,21 @@ describe('HTPasswd', () => {
     wrapper.adduser('test', 'somerandompassword', callback);
   });
 
+  it('addUser - it should not try to read and lock htpasswd file if first sanity check fails', done => {
+    fs.readFile = jest.fn((path, body, callback) => callback(null, ''));
+    const callback = a => {
+      expect(a.message).toEqual('username and password is required');
+      expect(fs.readFile).not.toHaveBeenCalled();
+      done();
+    };
+    wrapper.adduser(undefined, undefined, callback);
+  });
+
   it('addUser - it should add the user', done => {
-    fs.writeFile = jest.fn(() => done());
-    const callback = (a, b) => {
+    fs.writeFile = jest.fn((path, body, callback) => callback(null));
+    const callback = () => {
       expect(fs.writeFile).toHaveBeenCalled();
+      done();
     };
     wrapper.adduser('usernotpresent', 'somerandompassword', callback);
   });
