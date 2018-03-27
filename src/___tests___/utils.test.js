@@ -135,14 +135,14 @@ describe('sanityCheck', () => {
   beforeEach(() => {
     users = { test: '$66to3JK5RgZM' };
   });
-  it('should throw an error indicating the password is incorrect', () => {
+  it('should throw an incorrect password error', () => {
     const verifyFn = jest.fn(() => false);
     const input = sanityCheck('test', users.test, verifyFn, users, Infinity);
     expect(input.status).toEqual(403);
     expect(input.message).toEqual('unauthorized access');
     expect(verifyFn).toHaveBeenCalled();
   });
-  it('should throw an error indicating the max number of users was reached', () => {
+  it('should throw a max number of users was reached error', () => {
     const verifyFn = () => {};
     const input = sanityCheck('username', users.test, verifyFn, users, -1);
     expect(input.status).toEqual(403);
@@ -171,7 +171,7 @@ describe('sanityCheck', () => {
     expect(input.message).toEqual('username and password is required');
     expect(input.status).toEqual(400);
   });
-  it('should successfully  the user', () => {
+  it('should successfully authenticate the user', () => {
     const verifyFn = jest.fn(() => true);
     const input = sanityCheck('test', 'password', verifyFn, users, 2);
     expect(input.status).toEqual(409);
