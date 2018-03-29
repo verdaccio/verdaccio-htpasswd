@@ -171,7 +171,7 @@ describe('sanityCheck', () => {
     expect(input.message).toEqual('username and password is required');
     expect(input.status).toEqual(400);
   });
-  it('should successfully authenticate the user', () => {
+  it('should throw error for existing username and password', () => {
     const verifyFn = jest.fn(() => true);
     const input = sanityCheck('test', users.test, verifyFn, users, 2);
     expect(input.status).toEqual(409);
