@@ -148,3 +148,49 @@ export function sanityCheck(
 
   return null;
 }
+
+/**
+ * changePasswordToHTPasswd - change password for existing user
+ * @param {string} body
+ * @param {string} user
+ * @param {string} passwd
+ * @param {string} newPasswd
+ * @returns {string}
+ */
+export function changePasswordToHTPasswd(
+  body: string,
+  user: string,
+  passwd: string,
+  newPasswd: string
+): string {
+  if (crypt3) {
+    passwd = crypt3(passwd);
+    newPasswd = crypt3(newPasswd);
+  } else {
+    passwd = `{SHA}'${crypto
+      .createHash('sha1')
+      .update(passwd, 'binary')
+      .digest('base64')}`;
+
+    newPasswd = `{SHA}${crypto
+      .createHash('sha1')
+      .update(newPasswd, 'binary')
+      .digest('base64')}`;
+  }
+
+  let lines = body.split('\n');
+  lines = lines.map(line => {
+    let [username, password] = line.split(':', 3);
+    if (username == user) {
+      if (password == passwd) {
+        // replace old password hash with new password hash
+        line = line.replace(passwd, newPasswd);
+      } else {
+        throw new Error('Invalid old Password');
+      }
+    }
+    return line;
+  });
+
+  return lines.join('\n');
+}

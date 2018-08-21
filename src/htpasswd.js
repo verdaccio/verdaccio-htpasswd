@@ -8,6 +8,7 @@ import {
   unlockFile,
   parseHTPasswd,
   addUserToHTPasswd,
+  changePasswordToHTPasswd,
   sanityCheck
 } from './utils';
 
@@ -201,6 +202,63 @@ export default class HTPasswd {
 
         Object.assign(this.users, parseHTPasswd(buffer));
         callback();
+      });
+    });
+  }
+
+  /**
+   * changePassword - change password for existing user.
+   * @param {string} user
+   * @param {string} password
+   * @param {function} cd
+   * @returns {function}
+   */
+  changePassword(
+    user: string,
+    password: string,
+    newPassword: string,
+    realCb: Callback
+  ) {
+    lockAndRead(this.path, (err, res) => {
+      let locked = false;
+
+      // callback that cleans up lock first
+      const cb = err => {
+        if (locked) {
+          unlockFile(this.path, () => {
+            // ignore any error from the unlock
+            realCb(err, !err);
+          });
+        } else {
+          realCb(err, !err);
+        }
+      };
+
+      if (!err) {
+        locked = true;
+      }
+
+      if (err && err.code !== 'ENOENT') return cb(err);
+
+      let body = (res || '').toString('utf8');
+      this.users = parseHTPasswd(body);
+
+      if (!this.users[user]) {
+        return cb(new Error('User not found'));
+      }
+
+      try {
+        body = changePasswordToHTPasswd(body, user, password, newPassword);
+      } catch (err) {
+        return cb(err);
+      }
+      fs.writeFile(this.path, body, err => {
+        if (err) {
+          return cb(err);
+        }
+        this.reload(() => {
+          cb(null);
+        });
       });
     });
   }
