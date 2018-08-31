@@ -149,6 +149,13 @@ export function sanityCheck(
   return null;
 }
 
+export function getCryptoPassword(password) {
+  return `{SHA}'${crypto
+    .createHash('sha1')
+    .update(password, 'binary')
+    .digest('base64')}`;
+}
+
 /**
  * changePasswordToHTPasswd - change password for existing user
  * @param {string} body
@@ -167,15 +174,8 @@ export function changePasswordToHTPasswd(
     passwd = crypt3(passwd);
     newPasswd = crypt3(newPasswd);
   } else {
-    passwd = `{SHA}'${crypto
-      .createHash('sha1')
-      .update(passwd, 'binary')
-      .digest('base64')}`;
-
-    newPasswd = `{SHA}${crypto
-      .createHash('sha1')
-      .update(newPasswd, 'binary')
-      .digest('base64')}`;
+    passwd = getCryptoPassword(passwd);
+    newPasswd = getCryptoPassword(newPasswd);
   }
 
   let lines = body.split('\n');

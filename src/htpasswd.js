@@ -238,7 +238,9 @@ export default class HTPasswd {
         locked = true;
       }
 
-      if (err && err.code !== 'ENOENT') return cb(err);
+      if (err && err.code !== 'ENOENT') {
+        return cb(err);
+      }
 
       let body = (res || '').toString('utf8');
       this.users = parseHTPasswd(body);
