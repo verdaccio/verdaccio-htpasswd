@@ -149,7 +149,7 @@ export function sanityCheck(
   return null;
 }
 
-export function getCryptoPassword(password) {
+export function getCryptoPassword(password: string) {
   return `{SHA}'${crypto
     .createHash('sha1')
     .update(password, 'binary')

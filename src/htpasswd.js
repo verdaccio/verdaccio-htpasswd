@@ -199,6 +199,7 @@ export default class HTPasswd {
   }
 
   _stringToUt8(authentication: string): string {
+    // $FlowFixMe
     return (authentication || '').toString('utf8');
   }
 
