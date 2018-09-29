@@ -6,7 +6,9 @@ import {
   unlockFile,
   parseHTPasswd,
   addUserToHTPasswd,
-  sanityCheck
+  sanityCheck,
+  changePasswordToHTPasswd,
+  getCryptoPassword
 } from '../utils';
 
 describe('parseHTPasswd', () => {
@@ -204,5 +206,35 @@ describe('sanityCheck', () => {
     expect(input.status).toEqual(409);
     expect(input.message).toEqual('username is already registered');
     expect(verifyFn).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('changePasswordToHTPasswd', () => {
+  it('should throw error for wrong password', () => {
+    const body = 'test:$6b9MlB3WUELU:autocreated 2017-11-06T18:17:21.957Z';
+    try {
+      changePasswordToHTPasswd(
+        body,
+        'test',
+        'somerandompassword',
+        'newPassword'
+      );
+    } catch (error) {
+      expect(error.message).toEqual('Invalid old Password');
+    }
+  });
+
+  it('should change the password', () => {
+    const body = 'root:$6qLTHoPfGLy2:autocreated 2018-08-20T13:38:12.164Z';
+    expect(
+      changePasswordToHTPasswd(body, 'root', 'demo123', 'newPassword')
+    ).toMatchSnapshot();
+  });
+});
+
+describe('getCryptoPassword', () => {
+  it('should return the password hash', () => {
+    const passwordHash = `{SHA}'y9vkk2zovmMYTZ8uE/wkkjQ3G5o=`;
+    expect(getCryptoPassword('demo123')).toBe(passwordHash);
   });
 });
