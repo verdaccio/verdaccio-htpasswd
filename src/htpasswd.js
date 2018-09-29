@@ -110,6 +110,7 @@ export default class HTPasswd {
    * @returns {function}
    */
   adduser(user: string, password: string, realCb: Callback) {
+    const pathPass = this.path;
     let sanity = sanityCheck(
       user,
       password,
@@ -124,13 +125,13 @@ export default class HTPasswd {
       return realCb(sanity, false);
     }
 
-    lockAndRead(this.path, (err, res) => {
+    lockAndRead(pathPass, (err, res) => {
       let locked = false;
 
       // callback that cleans up lock first
       const cb = err => {
         if (locked) {
-          unlockFile(this.path, () => {
+          unlockFile(pathPass, () => {
             // ignore any error from the unlock
             realCb(err, !err);
           });
@@ -164,19 +165,10 @@ export default class HTPasswd {
       }
 
       try {
-        body = addUserToHTPasswd(body, user, password);
+        this._writeFile(addUserToHTPasswd(body, user, password), cb);
       } catch (err) {
         return cb(err);
       }
-
-      fs.writeFile(this.path, body, err => {
-        if (err) {
-          return cb(err);
-        }
-        this.reload(() => {
-          cb(null);
-        });
-      });
     });
   }
 
@@ -206,6 +198,22 @@ export default class HTPasswd {
     });
   }
 
+  _stringToUt8(authentication: string): string {
+    return (authentication || '').toString('utf8');
+  }
+
+  _writeFile(body: string, cb: Callback) {
+    fs.writeFile(this.path, body, err => {
+      if (err) {
+        cb(err);
+      } else {
+        this.reload(() => {
+          cb(null);
+        });
+      }
+    });
+  }
+
   /**
    * changePassword - change password for existing user.
    * @param {string} user
@@ -221,11 +229,12 @@ export default class HTPasswd {
   ) {
     lockAndRead(this.path, (err, res) => {
       let locked = false;
+      const pathPassFile = this.path;
 
       // callback that cleans up lock first
       const cb = err => {
         if (locked) {
-          unlockFile(this.path, () => {
+          unlockFile(pathPassFile, () => {
             // ignore any error from the unlock
             realCb(err, !err);
           });
@@ -242,7 +251,7 @@ export default class HTPasswd {
         return cb(err);
       }
 
-      let body = (res || '').toString('utf8');
+      let body = this._stringToUt8(res);
       this.users = parseHTPasswd(body);
 
       if (!this.users[user]) {
@@ -250,18 +259,13 @@ export default class HTPasswd {
       }
 
       try {
-        body = changePasswordToHTPasswd(body, user, password, newPassword);
+        this._writeFile(
+          changePasswordToHTPasswd(body, user, password, newPassword),
+          cb
+        );
       } catch (err) {
         return cb(err);
       }
-      fs.writeFile(this.path, body, err => {
-        if (err) {
-          return cb(err);
-        }
-        this.reload(() => {
-          cb(null);
-        });
-      });
     });
   }
 }
