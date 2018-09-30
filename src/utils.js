@@ -190,8 +190,9 @@ export function changePasswordToHTPasswd(
   let lines = body.split('\n');
   lines = lines.map(line => {
     const [username, password] = line.split(':', 3);
+
     if (username === user) {
-      if (password === passwd) {
+      if (password == _passwd) {
         // replace old password hash with new password hash
         line = line.replace(_passwd, _newPasswd);
       } else {
