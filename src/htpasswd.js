@@ -253,7 +253,7 @@ export default class HTPasswd {
         return cb(err);
       }
 
-      let body = this._stringToUt8(res);
+      const body = this._stringToUt8(res);
       this.users = parseHTPasswd(body);
 
       if (!this.users[user]) {

@@ -91,7 +91,7 @@ export function addUserToHTPasswd(
         .update(passwd, 'binary')
         .digest('base64');
   }
-  let comment = 'autocreated ' + new Date().toJSON();
+  const comment = 'autocreated ' + new Date().toJSON();
   let newline = `${user}:${passwd}:${comment}\n`;
 
   if (body.length && body[body.length - 1] !== '\n') {
@@ -177,21 +177,23 @@ export function changePasswordToHTPasswd(
   passwd: string,
   newPasswd: string
 ): string {
+  let _passwd;
+  let _newPasswd;
   if (crypt3) {
-    passwd = crypt3(passwd);
-    newPasswd = crypt3(newPasswd);
+    _passwd = crypt3(passwd);
+    _newPasswd = crypt3(newPasswd);
   } else {
-    passwd = getCryptoPassword(passwd);
-    newPasswd = getCryptoPassword(newPasswd);
+    _passwd = getCryptoPassword(passwd);
+    _newPasswd = getCryptoPassword(newPasswd);
   }
 
   let lines = body.split('\n');
   lines = lines.map(line => {
-    let [username, password] = line.split(':', 3);
-    if (username == user) {
-      if (password == passwd) {
+    const [username, password] = line.split(':', 3);
+    if (username === user) {
+      if (password === passwd) {
         // replace old password hash with new password hash
-        line = line.replace(passwd, newPasswd);
+        line = line.replace(_passwd, _newPasswd);
       } else {
         throw new Error('Invalid old Password');
       }
