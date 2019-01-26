@@ -7,14 +7,6 @@ jobs:
       - checkout
       - run: yarn install --no-progress --registry https://registry.verdaccio.org --no-lockfile
       - run: yarn run lint
-
-  test_6:
-    docker: 
-      - image: circleci/node:6
-    steps:
-      - checkout
-      - run: yarn install --no-progress --registry https://registry.verdaccio.org
-      - run: yarn run test
   
   test_8:
     docker: 
@@ -54,9 +46,6 @@ workflows:
   build_and_test:
     jobs:
       - lint
-      - test_6:
-          requires:
-            - lint
       - test_8:
           requires:
             - lint
