@@ -1,20 +1,21 @@
-workflow "PR" {
-  on = "pull_request"
-  resolves = ["test"]
-}
-
-workflow "Push" {
+workflow "build and test" {
   on = "push"
-  resolves = ["test"]
+  resolves = ["trivago/melody/actions/cli@github-actions"]
 }
 
 action "build" {
-  uses = "trivago/melody/actions/cli@github-actions"
-  args = "install"
+  uses = "docker://node:8"
+  args = "yarn install"
 }
 
 action "test" {
+  uses = "docker://node:8"
   needs = ["build"]
-   uses = "trivago/melody/actions/cli@github-actions"
-  args = "test"
+  args = "yarn test"
+} #
+
+action "trivago/melody/actions/cli@github-actions" {
+  uses = "trivago/melody/actions/cli@github-actions"
+  needs = ["test"]
+  args = "echo 'hello'"
 }
