@@ -15,13 +15,13 @@ workflow "Release" {
 
 action "build" {
   uses = "verdaccio/github-actions/yarn@master"
-  args = "yarn install"
+  args = "install"
 }
 
 action "test" {
   needs = ["build"]
   uses = "verdaccio/github-actions/yarn@master"
-  args = "yarn test"
+  args = "test"
 }
 
 action "publish to verdaccio" {
