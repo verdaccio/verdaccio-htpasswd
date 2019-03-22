@@ -9,12 +9,12 @@ workflow "Push" {
 }
 
 action "build" {
-  uses = "trivago/melody/actions/cli@github-actions"
+  uses = "verdaccio/github-actions/yarn@master"
   args = "install"
 }
 
 action "test" {
   needs = ["build"]
-   uses = "trivago/melody/actions/cli@github-actions"
+   uses = "verdaccio/github-actions/yarn@master"
   args = "test"
 }
