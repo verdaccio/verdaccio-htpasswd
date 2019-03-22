@@ -14,21 +14,21 @@ workflow "Release" {
 }
 
 action "build" {
-  uses = "verdaccio/github-actions/yarn@master"
-  args = "install"
+  uses = "trivago/melody/actions/cli@github-actions"
+  args = "n 8 && yarn install"
 }
 
 action "test" {
   needs = ["build"]
-  uses = "verdaccio/github-actions/yarn@master"
-  args = "test"
+   uses = "trivago/melody/actions/cli@github-actions"
+  args = "n 8 && yarn test"
 }
 
 action "publish to verdaccio" {
   uses = "trivago/melody/actions/cli@github-actions"
   needs = ["build", "test"]
   secrets = ["VERDACCIO_AUTH_TOKEN"]
-  args = "npm publish --registry https://registry.verdaccio.org"
+  args = "n 8 && npm publish --registry https://registry.verdaccio.org"
   env = {
     VERDACCIO_REGISTRY_URL = "registry.verdaccio.org"
   }
