@@ -15,7 +15,7 @@
 
 > This plugin is being used as dependency after `v3.0.0-beta.x`. The `v2.x` still contains this plugin built-in.
 
-## Install
+## Install test
 
 As simple as running:
 
