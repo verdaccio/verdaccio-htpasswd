@@ -25,10 +25,10 @@ action "test" {
 }
 
 action "publish to verdaccio" {
- uses = "trivago/melody/actions/cli@github-actions"
+  uses = "trivago/melody/actions/cli@github-actions"
   needs = ["build", "test"]
   secrets = ["VERDACCIO_AUTH_TOKEN"]
-  args = "yarn publish --registry https://registry.verdaccio.org"
+  args = "npm publish --registry https://registry.verdaccio.org"
   env = {
     VERDACCIO_REGISTRY_URL = "registry.verdaccio.org"
   }
