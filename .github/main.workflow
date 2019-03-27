@@ -13,7 +13,6 @@ workflow "check run" {
   resolves = ["test"]
 }
 
-
 action "build" {
   uses = "verdaccio/github-actions/yarn@master"
   args = "install"
@@ -21,6 +20,16 @@ action "build" {
 
 action "test" {
   needs = ["build"]
-   uses = "verdaccio/github-actions/yarn@master"
+  uses = "verdaccio/github-actions/yarn@master"
   args = "test"
+}
+
+workflow "release" {
+  on = "release"
+  resolves = ["trivago/melody/actions/cli"]
+}
+
+action "trivago/melody/actions/cli" {
+  uses = "trivago/melody/actions/cli@github-actions"
+  args = "echo $GITHUB_REF"
 }
