@@ -26,10 +26,16 @@ action "test" {
 
 workflow "release" {
   on = "release"
-  resolves = ["trivago/melody/actions/cli"]
+  resolves = ["trivago/melody/actions/cli@github-actions"]
 }
 
-action "trivago/melody/actions/cli" {
+action "test:release" {
   uses = "trivago/melody/actions/cli@github-actions"
-  args = "echo $GITHUB_REF"
+  args = "git checkout -b $(echo $GITHUB_REF | cut -d / -f3)"
+}
+
+action "trivago/melody/actions/cli@github-actions" {
+  uses = "trivago/melody/actions/cli@github-actions"
+  needs = ["test:release"]
+  args = "echo $(git rev-parse --abbrev-ref HEAD)"
 }
