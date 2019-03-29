@@ -26,5 +26,6 @@ workflow "release" {
 
 action "test:release" {
   uses = "trivago/melody/actions/cli@github-actions"
-  args = "git push origin github-actions"
+  args = "git push origin github-actions https://$GITHUB_TOKEN@github.com/username/bar.git"
+  secrets = ["GITHUB_TOKEN"]
 }
