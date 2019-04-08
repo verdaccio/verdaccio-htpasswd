@@ -1,21 +1,71 @@
 workflow "build and test" {
+  resolves = [
+    "lint",
+    "test",
+    "branch-filter",
+  ]
   on = "push"
-  resolves = ["trivago/melody/actions/cli@github-actions"]
 }
 
-action "build" {
-  uses = "docker://node:8"
+action "branch-filter" {
+  uses = "actions/bin/filter@master"
+  args = "branch"
+}
+
+action "install" {
+  uses = "docker://node:10"
   args = "yarn install"
 }
 
-action "test" {
-  uses = "docker://node:8"
-  needs = ["build"]
-  args = "yarn test"
-} #
+action "build" {
+  uses = "docker://node:10"
+  needs = ["install"]
+  args = "yarn run build"
+}
 
-action "trivago/melody/actions/cli@github-actions" {
-  uses = "trivago/melody/actions/cli@github-actions"
+action "lint" {
+  uses = "docker://node:10"
+  needs = ["install"]
+  args = "yarn run lint"
+}
+
+action "test" {
+  uses = "docker://node:10"
+  needs = ["build"]
+  args = "yarn run test"
+}
+
+workflow "release" {
+  resolves = [
+    "github-release",
+    "tag-filter",
+    "lint",
+  ]
+  on = "push"
+}
+
+action "tag-filter" {
+  uses = "actions/bin/filter@master"
+  args = "tag v*"
+}
+
+action "publish" {
   needs = ["test"]
-  args = "echo 'hello'"
+  uses = "docker://node:10"
+  args = "sh scripts/publish.sh"
+  secrets = [
+    "REGISTRY_AUTH_TOKEN",
+  ]
+  env = {
+    REGISTRY_URL = "registry.npmjs.org"
+  }
+}
+
+action "github-release" {
+  needs = ["publish"]
+  uses = "docker://node:10"
+  args = "sh scripts/github-release.sh"
+  secrets = [
+    "GITHUB_TOKEN",
+  ]
 }
