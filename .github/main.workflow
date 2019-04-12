@@ -1,7 +1,7 @@
 workflow "build and test" {
   resolves = [
     "lint",
-    "test",
+    "coverage",
   ]
   on = "push"
 }
@@ -14,7 +14,7 @@ action "branch-filter" {
 action "install" {
   needs = ["branch-filter"]
   uses = "docker://node:10"
-  args = "yarn install"
+  args = "yarn install --frozen-lockfile"
 }
 
 action "build" {
@@ -35,6 +35,11 @@ action "test" {
   args = "yarn run test"
 }
 
+action "coverage" {
+  uses = "docker://node:10"
+  needs = ["build"]
+  args = "yarn run coverage"
+}
 
 workflow "release" {
   resolves = [
@@ -52,7 +57,7 @@ action "release:tag-filter" {
 action "release:install" {
   uses = "docker://node:10"
   needs = ["release:tag-filter"]
-  args = "yarn install"
+  args = "yarn install --frozen-lockfile"
 }
 
 action "release:build" {
