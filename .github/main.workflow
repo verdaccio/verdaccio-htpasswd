@@ -2,7 +2,6 @@ workflow "build and test" {
   resolves = [
     "lint",
     "test",
-    "branch-filter",
   ]
   on = "push"
 }
@@ -13,6 +12,7 @@ action "branch-filter" {
 }
 
 action "install" {
+  needs = ["branch-filter"]
   uses = "docker://node:10"
   args = "yarn install"
 }
