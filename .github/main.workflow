@@ -37,7 +37,7 @@ action "test" {
 
 action "coverage" {
   uses = "docker://node:10"
-  needs = ["build"]
+  needs = ["test"]
   args = "yarn run coverage"
 }
 
