@@ -1,3 +1,6 @@
+## Deprecated repository
+
+**This repository has been moved to a monorepo you can find in [verdaccio/monorepo](https://github.com/verdaccio/monorepo). This package is located in [`plugins/htpasswd` folder](https://github.com/verdaccio/monorepo/tree/master/plugins/htpasswd)**
 
 [![verdaccio (latest)](https://img.shields.io/npm/v/verdaccio-htpasswd/latest.svg)](https://www.npmjs.com/package/verdaccio-htpasswd)
 [![Known Vulnerabilities](https://snyk.io/test/github/verdaccio/verdaccio-htpasswd/badge.svg?targetFile=package.json)](https://snyk.io/test/github/verdaccio/verdaccio-htpasswd?targetFile=package.json)
